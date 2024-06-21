@@ -1,5 +1,3 @@
-#Kareena Audit problem set 1 
-
 install.packages("wooldridge")
 library("wooldridge")
 
@@ -8,7 +6,6 @@ data("catholic")
 
 summary(catholic)
 
-#QUESTION 3
 #research question: 
 #Which independent variable effects the dependent variables (reading and math standardized scores) the most?
 
