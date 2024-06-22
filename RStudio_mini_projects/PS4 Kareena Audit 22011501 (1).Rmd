@@ -1,0 +1,92 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+  word_document: default
+---
+title: "Probelm set 4"
+author: "Kareena Audit"
+date: "2023-11-16"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r QUESTION 1}
+
+library(wooldridge)
+
+data(fertil2)
+
+model <- lm(children ~ educ + age + I(age^2), data = fertil2)
+
+summary(model)
+
+coef(model)
+```
+<!-- The intercept shows the number of children when all independent variables are zero. Shows that when education, age and age squared are zero, then the estimated number of children in -4.14. Because it is a negative number, it might not be significant.  -->
+
+<!-- Education shows that when holding all other variables constant and there is a one-unit increase in education means there is a decrease of children by 0.091. This means that as education increases, the number of children decrease.  -->
+
+<!-- Age shows with all other variables staying constant, a one-year increase in age also has an increase of children of 0.332. Therefore, as women get older, so does the number of children.  -->
+
+<!-- Age squared is a negative number, so the relationship between age and children are not strictly linear. As square age of children start to increase, the rate of number of children increases is slowing down.  -->
+
+```{r QUESTION 2}
+
+knitr::opts_chunk$set(echo = TRUE)
+
+library(wooldridge)
+library(plm)
+
+data("fertil2")
+
+model_endogenous <- plm(age ~ educ + I(age^2) + catholic, data = fertil2, model = "random")
+model_exogenous <- plm(age ~ educ + I(age^2), data = fertil2, model = "random")
+
+hausman_result <- phtest(model_endogenous, model_exogenous)
+
+hausman_result
+
+```
+<!-- I believed that the model had endogeneity because i believed that an independent variable was correlated with the error term, specifically age and whether if the person is catholic or not. I conducted a Hasum test to find out however, the test found that here is no evidence of endogeneity between age and catholic but this doesn't mean there is no other variables that can effect the independent variable.  -->
+
+``` {r QUESTION 3}
+
+library(lmtest)
+
+correlation <- cor(fertil2$educ, fertil2$urban)
+print(paste("Correlation between educ and urban:", correlation))
+
+
+exog_test_model <- lm(children ~ educ + age + I(age^2) + urban, data = fertil2)
+summary(exog_test_model)
+
+
+wald_test <- waldtest(exog_test_model, vcov = vcovHC(exog_test_model, type = "HC1"))
+print("Wald Test for Instrument Significance:")
+print(wald_test)
+
+```
+<!-- I used the variable "urban" as the potential instrument for the endogenous variable education. I used this because there is a relationship between the individual in urban areas as they may have better access to educational resources which leads to high education levels. Assuming that living in an urban area doesn't directly affect the number of children other than its impact on education.  -->
+
+```{r QUESTION 4}
+
+install.packages("AER")
+library(AER)
+
+iv_model <- ivreg(children ~ educ + age + I(age^2) | urban + age + I(age^2), data = fertil2)
+summary(iv_model)
+
+```
+```{r QUESTION 5}
+
+library(AER)
+
+iv_model_exog <- ivreg(children ~ educ + age + I(age^2) + electric + tv + bicycle | urban + age + I(age^2) + electric + tv + bicycle, data = fertil2)
+summary(iv_model_exog)
+```
+<!-- They are changes between the model with the additional exogenous variables and without. One notable change is the coefficient estimate. When including the additional variables, "educ" decreased from -0.237 to -0.277. Another change was the model fit. the additional variables had a weaker fit compared to the ones without the variables.  -->
+
