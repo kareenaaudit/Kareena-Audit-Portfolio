@@ -1,4 +1,4 @@
-# README: Portfolio of Projects by Kareena Audit
+# Portfolio of Projects by Kareena Audit
 
 ## Overview
 
